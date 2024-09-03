@@ -6,13 +6,15 @@ const userSchema = mongoose.Schema(
     {
         fname: {
             type: String,
-            required: [true, 'Please enter your first name']
+            required: [true, 'Please enter your first name'],
+            trim: true
 
         },
 
         sname: {
             type: String,
-            required: [true, 'Please enter your second name']
+            required: [true, 'Please enter your second name'],
+            trim: true
         },
         
         email: {

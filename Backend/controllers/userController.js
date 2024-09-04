@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler"
 import User from "../models/userModel.js"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
+import sendEmail from "../utils/sendEmail.js"
 const generateToken = (id) => {
     return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn:"30d"})
 }
@@ -178,6 +179,81 @@ const updateUser = asyncHandler(async (req, res) => {
 })
 
 
+//Sending Email
+const sendingEmail = asyncHandler(async (req, res) => {
+const {email} = req.body
+
+try {
+    const link = "https://reset.com"
+    const send_to = email
+    const send_from = process.env.EMAIL_USER
+    const subject = "Password Recovery";
+     const message = `<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Contact Form Submission</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .content {
+            padding: 10px 0;
+        }
+        .content p {
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h2>Password Recovery</h2>
+        </div>
+        <div class='content'>
+            Follow this link ${link} to reset your password
+        </div>
+        <div class='footer'>
+            <p>This email was sent from thefullnesshub.com</p>
+        </div>
+    </div>
+</body>
+</html>
+`
+
+    await sendEmail(subject, message, send_to, send_from)
+     res.status(200).json({success: true, message: "Email sent successfully"})
+} catch (error) {
+    res.status(500)
+    throw new Error("Server failed to send Email")
+}
+
+})
+
+
+
 
 
 
@@ -187,5 +263,6 @@ export {
     logoutUser,
     getUser,
     loginStatus,
-    updateUser    
+    updateUser,
+    sendingEmail    
 }

@@ -113,12 +113,79 @@ const loginUser = asyncHandler (async (req, res) => {
    }
 
 
+})
 
+// Logout 
+const logoutUser = asyncHandler (async (req, res) => {
+
+   res.cookie("token", "", {
+    path: "/",
+    httpOnly: "true",
+    expires: new Date(0)
+   })
+
+   res.status(200).json({message: "You have successfully logged out"})
+
+})
+
+const getUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user.id).select("-password")
+
+    if(user) {
+
+        res.status(200).json(user)
+
+    }else{
+        res.status(404);
+        throw new Error("User not found")
+    }
+
+})
+
+const loginStatus = asyncHandler(async (req, res) => {
+    const token = req.cookies.token
+    if(!token){
+       return res.json(false)
+    }
+
+    const verified = jwt.verify(token, process.env.JWT_SECRET)
+    if(verified) {
+        res.json(true)
+    }else{
+        res.json(false)
+    }
 
 })
 
 
+const updateUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user.id)
+
+    if(user){
+        const {fname, sname, phone, } = user
+        user.fname = req.body.fname ||  user.fname
+        user.sname = req.body.sname ||  user.sname
+        user.phone = req.body.phone ||  user.phone
+
+        const updateUser = await user.save()
+        res.status(200).json(updateUser)
+
+    }else{
+        res.status(404)
+        throw new Error("User not found")
+    }
+
+})
+
+
+
+
+
 export {
     registerUser,
-    loginUser
+    loginUser,
+    logoutUser,
+    getUser,
+    loginStatus,
+    updateUser    
 }

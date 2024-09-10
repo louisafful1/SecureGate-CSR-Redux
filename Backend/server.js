@@ -6,10 +6,6 @@ import cors from "cors"
 import router from "./router/userRoutes.js";
 import errorHandler from "./middleware/errorMiddleware.js";
 
-
-
-
-
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000
